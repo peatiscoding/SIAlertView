@@ -54,6 +54,8 @@ typedef void(^SIAlertViewHandler)(SIAlertView *alertView);
 @property (nonatomic, copy) SIAlertViewHandler willDismissHandler;
 @property (nonatomic, copy) SIAlertViewHandler didDismissHandler;
 
+@property (nonatomic, assign) BOOL dismissOnBlur;
+
 @property (nonatomic, readonly, getter = isVisible) BOOL visible;
 
 @property (nonatomic, readonly, getter = isParallaxEffectEnabled) BOOL enabledParallaxEffect;

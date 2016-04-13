@@ -160,6 +160,16 @@ static SIAlertView *__si_alert_current_view;
 {
     [super viewDidLoad];
     [self.alertView setup];
+    
+    if (self.alertView.dismissOnBlur) {
+        UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(cancel)];
+        [self.alertView addGestureRecognizer:tap];
+    }
+}
+
+- (void)cancel
+{
+    [self.alertView dismissAnimated:YES];
 }
 
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
