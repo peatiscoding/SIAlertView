@@ -187,7 +187,7 @@ static SIAlertView *__si_alert_current_view;
 }
 #endif
 
-- (NSUInteger)supportedInterfaceOrientations
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations
 {
     UIViewController *viewController = [self.alertView.oldKeyWindow currentViewController];
     if (viewController) {
@@ -267,7 +267,8 @@ static SIAlertView *__si_alert_current_view;
 - (id)initWithTitle:(NSString *)title andMessage:(NSString *)message
 {
 	self = [super init];
-	if (self) {
+    if (self) {
+        _customView = nil;
 		_title = title;
         _message = message;
         _enabledParallaxEffect = YES;
@@ -355,6 +356,12 @@ static SIAlertView *__si_alert_current_view;
 - (void)setMessage:(NSString *)message
 {
 	_message = message;
+    [self invalidateLayout];
+}
+
+- (void)setCustomView:(UIView *)customView
+{
+    _customView = customView;
     [self invalidateLayout];
 }
 
@@ -756,6 +763,14 @@ static SIAlertView *__si_alert_current_view;
         self.messageLabel.frame = CGRectMake(CONTENT_PADDING_LEFT, y, self.containerView.bounds.size.width - CONTENT_PADDING_LEFT * 2, height);
         y += height;
     }
+    if (self.customView) {
+        if (y > CONTENT_PADDING_TOP) {
+            y += GAP;
+        }
+        CGFloat height = self.customView.frame.size.height;
+        self.customView.frame = CGRectMake(CONTENT_PADDING_LEFT, y, self.containerView.bounds.size.width - CONTENT_PADDING_LEFT * 2, height);
+        y += height;
+    }
     if (self.items.count > 0) {
         if (y > CONTENT_PADDING_TOP) {
             y += GAP;
@@ -794,6 +809,12 @@ static SIAlertView *__si_alert_current_view;
             height += GAP;
         }
         height += [self heightForMessageLabel];
+    }
+    if (self.customView) {
+        if (height > CONTENT_PADDING_TOP) {
+            height += GAP;
+        }
+        height += self.customView.frame.size.height;
     }
     if (self.items.count > 0) {
         if (height > CONTENT_PADDING_TOP) {
@@ -888,6 +909,7 @@ static SIAlertView *__si_alert_current_view;
     [self updateTitleLabel];
     [self updateMessageLabel];
     [self setupButtons];
+    [self updateCustom];
     [self invalidateLayout];
 }
 
@@ -898,6 +920,9 @@ static SIAlertView *__si_alert_current_view;
     self.titleLabel = nil;
     self.messageLabel = nil;
     [self.buttons removeAllObjects];
+    if (self.customView) {
+        [self.customView removeFromSuperview];
+    }
     [self.alertWindow removeFromSuperview];
     self.alertWindow = nil;
     self.layoutDirty = NO;
@@ -961,6 +986,14 @@ static SIAlertView *__si_alert_current_view;
     } else {
         [self.messageLabel removeFromSuperview];
         self.messageLabel = nil;
+    }
+    [self invalidateLayout];
+}
+
+- (void)updateCustom
+{
+    if (self.customView) {
+        [self.containerView addSubview:self.customView];
     }
     [self invalidateLayout];
 }
