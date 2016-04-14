@@ -160,16 +160,6 @@ static SIAlertView *__si_alert_current_view;
 {
     [super viewDidLoad];
     [self.alertView setup];
-    
-    if (self.alertView.dismissOnBlur) {
-        UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(cancel)];
-        [self.alertView addGestureRecognizer:tap];
-    }
-}
-
-- (void)cancel
-{
-    [self.alertView dismissAnimated:YES];
 }
 
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
@@ -428,7 +418,14 @@ static SIAlertView *__si_alert_current_view;
         window.rootViewController = viewController;
         self.alertWindow = window;
     }
+    
     [self.alertWindow makeKeyAndVisible];
+    
+    UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(requestDismissOnBlur)];
+    [self.alertWindow addGestureRecognizer:tap];
+    
+    UITapGestureRecognizer * consumer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(noop)];
+    [self.containerView addGestureRecognizer:consumer];
     
     [self validateLayout];
     
@@ -448,6 +445,18 @@ static SIAlertView *__si_alert_current_view;
             [self dismissAnimated:YES cleanup:NO]; // dismiss to show next alert view
         }
     }];
+}
+
+- (void)noop {
+    // do nothing
+    // consumer click event
+}
+
+- (void)requestDismissOnBlur {
+    NSLog(@"Dismissing ... on blur");
+    if (self.dismissOnBlur) {
+        [self dismissAnimated:YES];
+    }
 }
 
 - (void)dismissAnimated:(BOOL)animated
